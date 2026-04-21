@@ -1,0 +1,5 @@
+awqaf-gov-ai.duckdns.org {
+    root * /usr/share/caddy
+    file_server
+    encode gzip
+}
