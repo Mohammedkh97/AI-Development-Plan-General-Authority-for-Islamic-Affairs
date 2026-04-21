@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خطة التحول الذكي - الهيئة العامة للشؤون الإسلامية والأوقاف</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        awqaf: {
+                            green: '#046A38',
+                            lightGreen: '#E8F5E9',
+                            gold: '#C5A059',
+                            dark: '#1F2937',
+                            light: '#F9FAFB'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F9FAFB;
+            color: #1F2937;
+        }
+        
+        .nav-active {
+            border-bottom: 3px solid #C5A059;
+            color: #046A38;
+            font-weight: 700;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        .layer-card {
+            transition: all 0.3s ease;
+        }
+        
+        .layer-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(4, 106, 56, 0.2);
+            border-color: #046A38;
+        }
+        
+        .timeline-node {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .timeline-node.active {
+            background-color: #046A38;
+            color: white;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- Chosen Palette: Warm Neutrals (Slate-50) with Awqaf Green (#046A38) and Gold/Sand Accents (#C5A059) for a professional, culturally aligned executive feel. -->
+    
+    <!-- Application Structure Plan: An Executive Dashboard structure with top navigation. Chosen because the target audience (Top Management) needs to quickly switch between high-level vision, specific projects, technical architecture, and ROI without losing context. It transforms a linear pitch deck into an exploratory data-driven narrative. -->
+    
+    <!-- Visualization & Content Choices: 
+         1. Vision/Impact: Donut Chart (Chart.js) -> Shows balanced distribution of AI impact areas (Customer, Internal, Waqf). 
+         2. Projects: Interactive Cards -> Click to reveal details. Better than static text for engagement.
+         3. Architecture: Tailwind CSS Stack diagram -> Interactive layers replacing complex static images. Hover reveals technical details.
+         4. Roadmap & ROI: CSS Timeline + Bar Chart (Chart.js) -> Quantifies the "Why" (ROI) and visualizes the "When" (Timeline). 
+         All choices strictly use Canvas or HTML/CSS. NO SVG. -->
+         
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20">
+                <div class="flex items-center">
+                    <span class="text-3xl mr-2">🏛️</span>
+                    <div class="flex flex-col">
+                        <span class="text-xl font-bold text-awqaf-green leading-tight">الهيئة العامة للشؤون الإسلامية والأوقاف</span>
+                        <span class="text-sm text-gray-500">خريطة طريق التحول بالذكاء الاصطناعي</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8 space-x-reverse">
+                    <button onclick="switchTab('vision')" id="btn-vision" class="nav-active text-gray-600 hover:text-awqaf-green px-3 py-2 text-md font-semibold transition-colors h-full flex items-center">الرؤية والتأثير</button>
+                    <button onclick="switchTab('projects')" id="btn-projects" class="text-gray-600 hover:text-awqaf-green px-3 py-2 text-md font-semibold transition-colors h-full flex items-center">المشاريع الاستراتيجية</button>
+                    <button onclick="switchTab('architecture')" id="btn-architecture" class="text-gray-600 hover:text-awqaf-green px-3 py-2 text-md font-semibold transition-colors h-full flex items-center">البنية التقنية</button>
+                    <button onclick="switchTab('roadmap')" id="btn-roadmap" class="text-gray-600 hover:text-awqaf-green px-3 py-2 text-md font-semibold transition-colors h-full flex items-center">خارطة الطريق والعائد</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <section id="vision" class="block animate-fade-in">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-8">
+                <h1 class="text-3xl font-bold text-awqaf-dark mb-4">تمكين الرؤية الشرعية واستدامة الأوقاف عبر تقنيات المستقبل</h1>
+                <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                    يعرض هذا القسم الرؤية الاستراتيجية لإدماج الذكاء الاصطناعي في الهيئة، وكيفية مواءمتها مع استراتيجية الإمارات 2031. الهدف ليس استخدام التقنية كأداة مساعدة فحسب، بل كـ <strong>طبقة تشغيلية ذكية</strong> ترتقي بالخدمات الدينية وترفع الكفاءة التشغيلية بنسبة مضاعفة.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-awqaf-lightGreen p-6 rounded-xl border border-green-100">
+                    <div>
+                        <h3 class="text-xl font-bold text-awqaf-green mb-4">المواءمة الوطنية (UAE AI Strategy 2031)</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><span class="text-awqaf-gold ml-2 font-bold">✓</span> الارتقاء بجودة الخدمات الحكومية الدينية.</li>
+                            <li class="flex items-start"><span class="text-awqaf-gold ml-2 font-bold">✓</span> رفع الكفاءة التشغيلية بنسبة مضاعفة.</li>
+                            <li class="flex items-start"><span class="text-awqaf-gold ml-2 font-bold">✓</span> استثمار بيانات الأوقاف لدعم الاقتصاد.</li>
+                            <li class="flex items-start"><span class="text-awqaf-gold ml-2 font-bold">✓</span> ترسيخ حوكمة الاستخدام المسؤول للذكاء الاصطناعي في المجال الشرعي.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm">
+                        <div class="text-center font-bold text-gray-700 mb-2">توزيع مجالات التأثير والقيمة المضافة</div>
+                        <div class="chart-container">
+                            <canvas id="impactChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="hidden animate-fade-in">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-awqaf-dark mb-4">أبرز المشاريع المقترحة</h2>
+                <p class="text-lg text-gray-600 leading-relaxed">
+                    يستعرض هذا القسم أهم المبادرات والمشاريع التقنية المقترحة ذات الأثر الأعلى. تم اختيار هذه المشاريع لتغطي الجوانب المجتمعية (الإفتاء)، الداخلية (الوثائق)، والاستثمارية (الأوقاف). اضغط على كل مشروع لمعرفة التفاصيل والتقنيات المستخدمة.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                    <div class="text-4xl mb-4 text-center">🤖</div>
+                    <h3 class="text-xl font-bold text-awqaf-green text-center mb-2">المفتي الذكي</h3>
+                    <p class="text-gray-500 text-center text-sm mb-4">Islamic AI Assistant</p>
+                    <div class="bg-gray-50 p-4 rounded-lg mt-4 h-48 overflow-y-auto">
+                        <p class="text-sm text-gray-700 mb-2 font-bold">الوصف:</p>
+                        <p class="text-sm text-gray-600 mb-3">مساعد افتراضي مدعوم بالذكاء الاصطناعي التوليدي للإجابة على الفتاوى الشائعة والاستفسارات الشرعية للمتعاملين على مدار الساعة.</p>
+                        <p class="text-sm text-gray-700 mb-2 font-bold">التقنية والأمان:</p>
+                        <p class="text-sm text-gray-600">يعتمد على تقنية (RAG + LLM) لضمان استخراج الإجابات من قاعدة بيانات الهيئة المعتمدة فقط، مما يضمن نسبة هلوسة صفرية (Zero Hallucination) ومرجعية شرعية دقيقة.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                    <div class="text-4xl mb-4 text-center">📊</div>
+                    <h3 class="text-xl font-bold text-awqaf-green text-center mb-2">منصة استدامة الأوقاف</h3>
+                    <p class="text-gray-500 text-center text-sm mb-4">Waqf AI Analytics</p>
+                    <div class="bg-gray-50 p-4 rounded-lg mt-4 h-48 overflow-y-auto">
+                        <p class="text-sm text-gray-700 mb-2 font-bold">الوصف:</p>
+                        <p class="text-sm text-gray-600 mb-3">منصة تحليلية ذكية لقطاع الأوقاف تهدف إلى تعظيم العوائد الاستثمارية وتحليل بيانات وتوجهات التبرعات.</p>
+                        <p class="text-sm text-gray-700 mb-2 font-bold">القدرات الرئيسية:</p>
+                        <ul class="text-sm text-gray-600 list-disc list-inside">
+                            <li>تحليلات تنبؤية (Predictive Analytics) للإيرادات الموسمية.</li>
+                            <li>تحليل سلوك المتبرعين بدقة.</li>
+                            <li>نظام توصية (Recommendation Engine) لتوجيه التبرعات نحو المشاريع الوقفية الأكثر احتياجاً والأعلى أثراً.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                    <div class="text-4xl mb-4 text-center">📄</div>
+                    <h3 class="text-xl font-bold text-awqaf-green text-center mb-2">المعالجة الذكية للوثائق</h3>
+                    <p class="text-gray-500 text-center text-sm mb-4">Intelligent Document Processing</p>
+                    <div class="bg-gray-50 p-4 rounded-lg mt-4 h-48 overflow-y-auto">
+                        <p class="text-sm text-gray-700 mb-2 font-bold">الوصف:</p>
+                        <p class="text-sm text-gray-600 mb-3">نظام أتمتة متقدم يستهدف العمليات الداخلية في الهيئة لتسريع الإجراءات الروتينية وتفريغ طاقات الموظفين لمهام استراتيجية أكبر.</p>
+                        <p class="text-sm text-gray-700 mb-2 font-bold">المميزات:</p>
+                        <p class="text-sm text-gray-600">يعتمد على نماذج قراءة النصوص العربية (OCR) ومعالجة اللغات الطبيعية (NLP) لقراءة وتصنيف عقود الوقف، طلبات التبرع، والمراسلات الرسمية واستخراج البيانات منها آلياً.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="architecture" class="hidden animate-fade-in">
+             <div class="mb-8">
+                <h2 class="text-3xl font-bold text-awqaf-dark mb-4">البنية التقنية المؤسسية (Enterprise Tech Architecture)</h2>
+                <p class="text-lg text-gray-600 leading-relaxed">
+                    يوضح هذا القسم الهيكلية التقنية المقترحة لدمج الذكاء الاصطناعي مع أنظمة الهيئة الحالية بشكل سلس وآمن. مرر مؤشر الماوس فوق طبقات النظام أدناه لاستكشاف تفاصيل كل طبقة ودورها في ضمان الامتثال والكفاءة.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-4 flex flex-col-reverse">
+                    
+                    <div class="layer-card bg-slate-800 text-white p-4 rounded-lg border-2 border-transparent text-center cursor-pointer" onmouseover="updateArchDetails('data')" onmouseout="clearArchDetails()">
+                        <div class="text-xl mb-1">🗄️</div>
+                        <h4 class="font-bold text-lg">طبقة البيانات (Data Layer)</h4>
+                    </div>
+                    
+                    <div class="layer-card bg-blue-600 text-white p-4 rounded-lg border-2 border-transparent text-center cursor-pointer" onmouseover="updateArchDetails('ai')" onmouseout="clearArchDetails()">
+                        <div class="text-xl mb-1">🧠</div>
+                        <h4 class="font-bold text-lg">طبقة الذكاء الاصطناعي (AI Layer)</h4>
+                    </div>
+                    
+                    <div class="layer-card bg-awqaf-gold text-white p-4 rounded-lg border-2 border-transparent text-center cursor-pointer" onmouseover="updateArchDetails('services')" onmouseout="clearArchDetails()">
+                        <div class="text-xl mb-1">📱</div>
+                        <h4 class="font-bold text-lg">طبقة الخدمات (Service Layer)</h4>
+                    </div>
+                    
+                    <div class="layer-card bg-awqaf-green text-white p-4 rounded-lg border-2 border-transparent text-center cursor-pointer" onmouseover="updateArchDetails('gov')" onmouseout="clearArchDetails()">
+                        <div class="text-xl mb-1">🛡️</div>
+                        <h4 class="font-bold text-lg">طبقة الحوكمة والأمان (Governance)</h4>
+                    </div>
+
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 min-h-[300px] flex flex-col justify-center">
+                    <h3 id="arch-title" class="text-2xl font-bold text-awqaf-dark mb-4 text-center">التكامل السلس والآمن</h3>
+                    <p id="arch-desc" class="text-gray-600 text-center leading-relaxed text-lg">
+                        تعتمد استراتيجيتنا على البنية التحتية القوية الحالية للهيئة. مرر الماوس على الطبقات المجاورة لمعرفة كيف تتكامل التقنيات الحديثة مع النظام البيئي للهيئة.
+                    </p>
+                    <div id="arch-items" class="mt-6 flex flex-wrap justify-center gap-2 hidden">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="roadmap" class="hidden animate-fade-in">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-awqaf-dark mb-4">خارطة الطريق والعائد على الاستثمار (ROI)</h2>
+                <p class="text-lg text-gray-600 leading-relaxed">
+                    يعرض هذا القسم الجدول الزمني المقترح للتنفيذ مقسماً إلى ثلاث مراحل، بالإضافة إلى تحليل توضيحي للعائد المتوقع على الاستثمار من خلال تقليل وقت المعالجة اليدوية وزيادة الكفاءة التشغيلية. تفاعل مع المراحل الزمنية لمعرفة مخرجات كل مرحلة.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold text-xl text-awqaf-green mb-6 text-center">المراحل التنفيذية (Execution Roadmap)</h3>
+                    
+                    <div class="relative border-r-4 border-gray-200 pr-6 space-y-8 py-4 mr-4">
+                        
+                        <div onclick="updateRoadmap('phase1', this)" class="timeline-node active bg-gray-50 border border-gray-200 p-4 rounded-xl -mr-10 relative z-10 w-full shadow-sm">
+                            <div class="absolute w-4 h-4 rounded-full bg-awqaf-green -right-9 top-6 border-4 border-white shadow"></div>
+                            <h4 class="font-bold text-lg mb-1">المرحلة الأولى: مكاسب سريعة</h4>
+                            <p class="text-sm font-semibold text-awqaf-gold">من 1 إلى 3 أشهر</p>
+                        </div>
+
+                        <div onclick="updateRoadmap('phase2', this)" class="timeline-node bg-white border border-gray-200 p-4 rounded-xl -mr-10 relative z-10 w-full shadow-sm text-gray-600 hover:bg-gray-50 hover:text-awqaf-dark">
+                            <div class="absolute w-4 h-4 rounded-full bg-gray-300 -right-9 top-6 border-4 border-white shadow"></div>
+                            <h4 class="font-bold text-lg mb-1">المرحلة الثانية: التوسع والأتمتة</h4>
+                            <p class="text-sm font-semibold text-gray-500">من 3 إلى 6 أشهر</p>
+                        </div>
+
+                        <div onclick="updateRoadmap('phase3', this)" class="timeline-node bg-white border border-gray-200 p-4 rounded-xl -mr-10 relative z-10 w-full shadow-sm text-gray-600 hover:bg-gray-50 hover:text-awqaf-dark">
+                            <div class="absolute w-4 h-4 rounded-full bg-gray-300 -right-9 top-6 border-4 border-white shadow"></div>
+                            <h4 class="font-bold text-lg mb-1">المرحلة الثالثة: التحول الشامل</h4>
+                            <p class="text-sm font-semibold text-gray-500">من 6 إلى 12 شهراً</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-awqaf-lightGreen rounded-lg border border-green-100 min-h-[120px]">
+                        <h5 class="font-bold text-awqaf-dark mb-2" id="phase-title">مخرجات المرحلة الأولى:</h5>
+                        <ul id="phase-details" class="list-disc list-inside text-sm text-gray-700 space-y-1">
+                            <li>إطلاق نسخة تجريبية (MVP) للمفتي الذكي.</li>
+                            <li>محرك بحث دلالي للموظفين للبحث في الفتاوى السابقة.</li>
+                            <li>لوحة تحكم (Dashboard) ذكية لتحليل التبرعات.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-xl text-awqaf-dark mb-2 text-center">أثر التحول الذكي: الوقت الموفر والعائد</h3>
+                        <p class="text-sm text-gray-500 text-center mb-4">مقارنة تقديرية لزمن الإنجاز (بالساعات) قبل وبعد تبني تقنيات الذكاء الاصطناعي في العمليات الرئيسية.</p>
+                        <div class="chart-container">
+                            <canvas id="roiChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 text-white p-6 rounded-2xl shadow-sm">
+                        <h3 class="font-bold text-xl text-awqaf-gold mb-4 text-center">الخطوات القادمة والمطلوبة للاعتماد</h3>
+                        <div class="flex flex-col sm:flex-row justify-around items-center gap-4 text-center">
+                            <div class="bg-slate-700 p-4 rounded-lg w-full flex-1">
+                                <span class="text-2xl mb-2 block">1️⃣</span>
+                                <p class="text-sm font-bold">اعتماد النموذج الأولي</p>
+                                <p class="text-xs text-gray-300 mt-1">البدء في بناء (POC) للمفتي الذكي خلال 30 يوماً.</p>
+                            </div>
+                            <div class="bg-slate-700 p-4 rounded-lg w-full flex-1">
+                                <span class="text-2xl mb-2 block">2️⃣</span>
+                                <p class="text-sm font-bold">ورشة استراتيجية</p>
+                                <p class="text-xs text-gray-300 mt-1">تحديد أولويات البيانات مع قطاع الإفتاء والأوقاف.</p>
+                            </div>
+                            <div class="bg-slate-700 p-4 rounded-lg w-full flex-1">
+                                <span class="text-2xl mb-2 block">3️⃣</span>
+                                <p class="text-sm font-bold">تخصيص الموارد</p>
+                                <p class="text-xs text-gray-300 mt-1">تأمين موارد سحابية لبيئة تطوير آمنة ومنفصلة.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const architectureData = {
+            gov: {
+                title: "طبقة الحوكمة والأمان 🛡️",
+                desc: "تعتبر هذه الطبقة الأهم لضمان التوافق الشرعي. تقوم بمراقبة أداء نماذج الذكاء الاصطناعي، منع الهلوسة التقنية، وضمان خصوصية بيانات الهيئة والمستفيدين.",
+                items: ["ضوابط الوصول (Access Control)", "سجلات التدقيق (Audit Logs)", "الامتثال الديني (Sharia Compliance)", "مراقبة النماذج (Model Monitoring)"]
+            },
+            services: {
+                title: "طبقة الخدمات والتكامل 📱",
+                desc: "تعمل كحلقة وصل بين قدرات الذكاء الاصطناعي والأنظمة الفعلية التي يستخدمها الموظفون والمتعاملون.",
+                items: ["واجهات الربط (APIs)", "تطبيق الهيئة الذكي", "لوحات تحكم الإدارة (Dashboards)", "بوابات الرد الآلي (Chatbot/Voicebot)"]
+            },
+            ai: {
+                title: "طبقة نماذج الذكاء الاصطناعي 🧠",
+                desc: "المحرك الذكي للنظام، حيث يتم معالجة اللغة العربية، استخراج النصوص من الوثائق، وتوليد التحليلات التنبؤية.",
+                items: ["النماذج التوليدية (LLMs)", "نظام معالجة الرؤية (OCR)", "خوارزميات التوصية (Recommendation)", "التحليلات التنبؤية (Predictive)"]
+            },
+            data: {
+                title: "طبقة البيانات والبنية التحتية 🗄️",
+                desc: "الأساس الذي تُبنى عليه جميع الأنظمة، حيث يتم تخزين فتاوى الهيئة ووثائقها بطريقة تسهل على الذكاء الاصطناعي استرجاعها بدقة تامة.",
+                items: ["قواعد بيانات المتجهات (Vector DBs)", "مستودع البيانات المركزي", "خطوط معالجة البيانات (Data Pipelines)", "أرشفة الوثائق"]
+            }
+        };
+
+        const roadmapData = {
+            phase1: {
+                title: "مخرجات المرحلة الأولى:",
+                details: [
+                    "إطلاق نسخة تجريبية (MVP) للمفتي الذكي للأسئلة الشائعة.",
+                    "محرك بحث دلالي (Semantic Search) للموظفين للفتاوى.",
+                    "لوحة تحكم (Dashboard) ذكية لتحليل بيانات التبرعات."
+                ]
+            },
+            phase2: {
+                title: "مخرجات المرحلة الثانية:",
+                details: [
+                    "إطلاق نظام قراءة الوثائق الآلي (OCR) لعقود الوقف.",
+                    "تفعيل نظام التوصيات الآلي للمتبرعين في التطبيق.",
+                    "الربط الكامل مع أنظمة الهيئة (ERP)."
+                ]
+            },
+            phase3: {
+                title: "مخرجات المرحلة الثالثة:",
+                details: [
+                    "تفعيل المساعد الصوتي المتقدم (Voice AI) لخدمات كبار السن.",
+                    "إطلاق نظام التنبؤ باحتياجات المساجد (كهرباء، كثافة، صيانة).",
+                    "أتمتة تقارير الامتثال والتدقيق الداخلي بشكل كامل."
+                ]
+            }
+        };
+
+        let impactChartInstance = null;
+        let roiChartInstance = null;
+
+        function switchTab(tabId) {
+            ['vision', 'projects', 'architecture', 'roadmap'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+                document.getElementById(`btn-${id}`).classList.remove('nav-active');
+            });
+            
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(`btn-${tabId}`).classList.add('nav-active');
+
+            if (tabId === 'vision' && !impactChartInstance) {
+                initImpactChart();
+            } else if (tabId === 'roadmap' && !roiChartInstance) {
+                initRoiChart();
+            }
+        }
+
+        function updateArchDetails(layerKey) {
+            const data = architectureData[layerKey];
+            document.getElementById('arch-title').innerText = data.title;
+            document.getElementById('arch-desc').innerText = data.desc;
+            
+            const itemsContainer = document.getElementById('arch-items');
+            itemsContainer.innerHTML = '';
+            itemsContainer.classList.remove('hidden');
+            
+            data.items.forEach(item => {
+                const span = document.createElement('span');
+                span.className = 'bg-gray-100 text-awqaf-dark px-3 py-1 rounded-full text-sm font-semibold border border-gray-200';
+                span.innerText = item;
+                itemsContainer.appendChild(span);
+            });
+        }
+
+        function clearArchDetails() {
+            document.getElementById('arch-title').innerText = "التكامل السلس والآمن";
+            document.getElementById('arch-desc').innerText = "تعتمد استراتيجيتنا على البنية التحتية القوية الحالية للهيئة. مرر الماوس على الطبقات المجاورة لمعرفة كيف تتكامل التقنيات الحديثة مع النظام البيئي للهيئة.";
+            document.getElementById('arch-items').classList.add('hidden');
+            document.getElementById('arch-items').innerHTML = '';
+        }
+
+        function updateRoadmap(phaseKey, element) {
+            document.querySelectorAll('.timeline-node').forEach(node => {
+                node.classList.remove('active', 'bg-awqaf-green', 'text-white');
+                node.classList.add('bg-white', 'text-gray-600');
+                node.querySelector('div').classList.replace('bg-awqaf-green', 'bg-gray-300');
+                node.querySelector('p').classList.replace('text-awqaf-gold', 'text-gray-500');
+            });
+
+            element.classList.add('active', 'bg-awqaf-green', 'text-white');
+            element.classList.remove('bg-white', 'text-gray-600');
+            element.querySelector('div').classList.replace('bg-gray-300', 'bg-awqaf-green');
+            element.querySelector('p').classList.replace('text-gray-500', 'text-awqaf-gold');
+
+            const data = roadmapData[phaseKey];
+            document.getElementById('phase-title').innerText = data.title;
+            
+            const ul = document.getElementById('phase-details');
+            ul.innerHTML = '';
+            data.details.forEach(detail => {
+                const li = document.createElement('li');
+                li.innerText = detail;
+                ul.appendChild(li);
+            });
+        }
+
+        function initImpactChart() {
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            impactChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['تجربة المتعاملين (الفتاوى والمساجد)', 'العمليات الداخلية (أتمتة الوثائق)', 'قطاع الأوقاف (تحليلات الاستثمار)'],
+                    datasets: [{
+                        data: [35, 30, 35],
+                        backgroundColor: ['#046A38', '#C5A059', '#1F2937'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            rtl: true,
+                            labels: { font: { family: 'Cairo' } }
+                        },
+                        tooltip: {
+                            titleFont: { family: 'Cairo' },
+                            bodyFont: { family: 'Cairo' }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        function initRoiChart() {
+            const ctx = document.getElementById('roiChart').getContext('2d');
+            roiChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['البحث عن الفتاوى المعقدة', 'تصنيف ومراجعة العقود', 'تحليل اتجاهات التبرع'],
+                    datasets: [
+                        {
+                            label: 'العمل التقليدي (ساعات/أسبوع)',
+                            data: [120, 200, 80],
+                            backgroundColor: '#9CA3AF',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'بعد تفعيل الذكاء الاصطناعي (ساعات/أسبوع)',
+                            data: [15, 30, 5],
+                            backgroundColor: '#046A38',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            rtl: true,
+                            labels: { font: { family: 'Cairo' } }
+                        },
+                        tooltip: {
+                            titleFont: { family: 'Cairo' },
+                            bodyFont: { family: 'Cairo' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f3f4f6' },
+                            ticks: { font: { family: 'Cairo' } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Cairo' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        window.onload = () => {
+            initImpactChart();
+        };
+
+    </script>
+</body>
+</html>
