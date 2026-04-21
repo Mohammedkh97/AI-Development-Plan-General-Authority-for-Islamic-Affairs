@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المفتي الذكي - خطة التنفيذ التفاعلية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            900: '#134e4a',
+                            accent: '#f59e0b',
+                            dark: '#0f172a',
+                            danger: '#e11d48'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #0f172a;
+            scroll-behavior: smooth;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        .interactive-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .interactive-card:hover, .interactive-card.active {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(13, 148, 136, 0.2);
+            border-color: #0d9488;
+        }
+
+        .interactive-card.active {
+            background-color: #f0fdfa;
+            border-width: 2px;
+        }
+
+        .nav-link.active {
+            color: #0d9488;
+            border-bottom: 2px solid #0d9488;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- Chosen Palette: Vibrant Teal & Amber -->
+    <!-- Application Structure Plan: A dynamic, interactive SPA structured to guide the user from the high-level vision down to technical specifics. It uses sticky navigation for ease of exploration. The core feature is an interactive Agentic RAG pipeline where clicking each phase updates a detailed context panel. Data visualizations are used to emphasize safety (Guardrails) and project timelines. This non-linear, exploratory structure makes complex AI architectures easily digestible for decision-makers. -->
+    <!-- Visualization & Content Choices: 
+         1. Executive Summary: Goal: Inform. Method: Styled text and KPI-style callouts. Justification: Sets immediate context.
+         2. Agentic RAG Pipeline: Goal: Organize/Relationships. Method: Interactive Grid + JS State updates. Justification: Breaks down the 4 complex phases into clickable elements without relying on static SVGs.
+         3. Guardrails (Safety): Goal: Compare. Method: Chart.js Doughnut Chart. Justification: Visually quantifies the strict 85% confidence threshold vs human fallback. NO SVG used.
+         4. Timeline: Goal: Change (Time). Method: Chart.js Stacked Bar Chart. Justification: Clearly displays concurrent workstreams over the 4-week POC. NO SVG used.
+         5. Resources: Goal: Organize. Method: Tailwind Grid Cards. Justification: Cleanly lists technical prerequisites. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl mr-2">&#x1F3DB;</span>
+                    <span class="font-bold text-brand-900 text-lg md:text-xl">المفتي الذكي</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8 space-x-reverse">
+                    <a href="#summary" class="nav-link active text-gray-600 hover:text-brand-600 px-3 py-2 text-sm font-semibold transition-colors">الملخص التنفيذي</a>
+                    <a href="#pipeline" class="nav-link text-gray-600 hover:text-brand-600 px-3 py-2 text-sm font-semibold transition-colors">معمارية النظام</a>
+                    <a href="#guardrails" class="nav-link text-gray-600 hover:text-brand-600 px-3 py-2 text-sm font-semibold transition-colors">ضوابط الأمان</a>
+                    <a href="#timeline" class="nav-link text-gray-600 hover:text-brand-600 px-3 py-2 text-sm font-semibold transition-colors">خارطة الطريق</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-brand-dark text-white py-20 px-4 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-brand-900 to-brand-dark opacity-90"></div>
+        <div class="max-w-5xl mx-auto relative z-10 text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-brand-100 to-brand-500">
+                مشروع "المفتي الذكي"
+            </h1>
+            <h2 class="text-xl md:text-2xl text-gray-300 font-semibold mb-8">
+                الهيئة العامة للشؤون الإسلامية والأوقاف
+            </h2>
+            <div class="inline-flex flex-col md:flex-row items-center justify-center gap-4 bg-white/10 p-4 rounded-2xl border border-white/20 backdrop-blur-sm">
+                <div class="flex items-center">
+                    <span class="text-brand-accent text-2xl ml-2">&#x26A1;</span>
+                    <span class="font-bold mr-2">التقنية الأساسية:</span>
+                </div>
+                <span class="text-lg tracking-wide">Agentic RAG Pipeline (LangGraph & GPT-4o)</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-24">
+
+        <section id="summary" class="scroll-mt-24">
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12">
+                <div class="max-w-4xl mx-auto text-center mb-10">
+                    <h2 class="text-3xl font-bold text-brand-dark mb-4">الملخص التنفيذي للمشروع</h2>
+                    <div class="w-16 h-1 bg-brand-600 mx-auto rounded-full mb-6"></div>
+                    <p class="text-lg text-gray-600 leading-relaxed">
+                        يهدف مشروع "المفتي الذكي" إلى بناء مساعد افتراضي قادر على تقديم إجابات شرعية موثوقة للجمهور بناءً على قاعدة بيانات فتاوى الهيئة المعتمدة فقط. لتجنب مخاطر "الهلوسة" المعتادة في النماذج اللغوية، يعتمد النظام على معمارية التوليد المعزز بالاسترجاع الموجه بالوكلاء، مع وضع ضوابط أمان صارمة تضمن المرجعية الشرعية.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="pipeline" class="scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-brand-dark mb-4">مراحل التنفيذ التقني التفاعلية</h2>
+                <div class="w-16 h-1 bg-brand-600 mx-auto rounded-full mb-6"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    استكشف خط أنابيب الاسترجاع الوكائلي بالنقر على المراحل أدناه لمعرفة التفاصيل التقنية.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="interactive-card active bg-white border border-gray-200 p-5 rounded-2xl flex items-center" onclick="updatePipelineDisplay('phase1', this)">
+                        <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-2xl ml-4 font-bold">1</div>
+                        <h3 class="text-lg font-bold text-brand-dark">بناء قاعدة المعرفة (Knowledge Base)</h3>
+                    </div>
+                    
+                    <div class="interactive-card bg-white border border-gray-200 p-5 rounded-2xl flex items-center" onclick="updatePipelineDisplay('phase2', this)">
+                        <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-2xl ml-4 font-bold">2</div>
+                        <h3 class="text-lg font-bold text-brand-dark">خط أنابيب الاسترجاع (LangGraph)</h3>
+                    </div>
+
+                    <div class="interactive-card bg-white border border-gray-200 p-5 rounded-2xl flex items-center" onclick="updatePipelineDisplay('phase3', this)">
+                        <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-2xl ml-4 font-bold">3</div>
+                        <h3 class="text-lg font-bold text-brand-dark">ضوابط الأمان والتوليد (Guardrails)</h3>
+                    </div>
+
+                    <div class="interactive-card bg-white border border-gray-200 p-5 rounded-2xl flex items-center" onclick="updatePipelineDisplay('phase4', this)">
+                        <div class="w-12 h-12 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-2xl ml-4 font-bold">4</div>
+                        <h3 class="text-lg font-bold text-brand-dark">واجهة المستخدم والتقييم (Output)</h3>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7">
+                    <div class="bg-brand-dark rounded-3xl p-8 h-full shadow-lg relative overflow-hidden flex flex-col justify-center min-h-[300px]">
+                        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-brand-500 via-transparent to-transparent"></div>
+                        
+                        <div id="pipeline-content" class="relative z-10 fade-in">
+                            <h3 class="text-2xl font-bold text-brand-accent mb-6" id="disp-title">المرحلة الأولى: بناء قاعدة المعرفة ومعالجة البيانات</h3>
+                            <ul class="space-y-4 text-gray-300" id="disp-list">
+                                <li class="flex items-start">
+                                    <span class="text-brand-500 ml-3 mt-1">&#x25A0;</span>
+                                    <span><strong>تجميع البيانات:</strong> استخراج وتنظيف الفتاوى السابقة، قرارات مجلس الإمارات للإفتاء الشرعي، والكتب المعتمدة لدى الهيئة.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-brand-500 ml-3 mt-1">&#x25A0;</span>
+                                    <span><strong>التقسيم الذكي (Smart Chunking):</strong> تقسيم النصوص مع الحفاظ على السياق الشرعي للسؤال والجواب معاً، وعدم فصل الأدلة عن شرحها.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-brand-500 ml-3 mt-1">&#x25A0;</span>
+                                    <span><strong>تضمين النصوص:</strong> استخدام `text-embedding-3-large` لتحويل النصوص إلى متجهات رياضية.</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-brand-500 ml-3 mt-1">&#x25A0;</span>
+                                    <span><strong>قاعدة بيانات المتجهات:</strong> تخزين المتجهات في `ChromaDB` أو `Weaviate` لسرعة الاسترجاع الدلالي.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="guardrails" class="scroll-mt-24">
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold text-brand-dark mb-4">الضوابط الصارمة والموثوقية</h2>
+                        <div class="w-16 h-1 bg-brand-danger mx-auto lg:mx-0 rounded-full mb-6"></div>
+                        <p class="text-gray-600 mb-8 leading-relaxed">
+                            تُعد طبقة الضوابط (Guardrails) الأهم في المشروع لضمان عدم خروج النظام عن النص. يحلل النظام النطاق (هل السؤال شرعي أم سياسي/طبي؟) ثم يقيم نسبة التطابق.
+                        </p>
+                        <div class="bg-rose-50 border-r-4 border-brand-danger p-6 rounded-l-xl">
+                            <h4 class="font-bold text-brand-dark text-lg mb-2">آلية حد الثقة (Confidence Threshold)</h4>
+                            <p class="text-gray-700 text-sm">
+                                إذا كانت الفتاوى المسترجعة لا تجيب على السؤال بنسبة ثقة تتجاوز <strong>85%</strong>، يتم إيقاف نموذج `GPT-4o` فوراً، ويتم تفعيل مسار "التحويل إلى مفتي بشري" وتسجيل السؤال في لوحة تحكم التغذية الراجعة.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <h3 class="text-lg font-bold text-gray-700 mb-4 text-center">مسار اتخاذ القرار التلقائي</h3>
+                        <div class="chart-container w-full">
+                            <canvas id="confidenceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="timeline" class="scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-brand-dark mb-4">خارطة الطريق الزمنية (نموذج POC)</h2>
+                <div class="w-16 h-1 bg-brand-600 mx-auto rounded-full mb-6"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto">
+                    جدول زمني مكثف لمدة 4 أسابيع لتطوير واختبار نموذج إثبات المفهوم. يوضح الرسم البياني حجم وتوزيع الجهد عبر مسارات العمل.
+                </p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                <div class="chart-container w-full">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="resources" class="scroll-mt-24 pb-12">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-brand-dark mb-4">الموارد التقنية المطلوبة</h2>
+                <div class="w-16 h-1 bg-brand-600 mx-auto rounded-full mb-6"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow text-center">
+                    <div class="text-4xl mb-4">&#x2601;</div>
+                    <h3 class="font-bold text-brand-dark mb-2">منصة سحابية</h3>
+                    <p class="text-sm text-gray-600">حساب Azure / AWS مخصص لبيانات الهيئة لضمان الخصوصية.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow text-center">
+                    <div class="text-4xl mb-4">&#x1F511;</div>
+                    <h3 class="font-bold text-brand-dark mb-2">اشتراكات API</h3>
+                    <p class="text-sm text-gray-600">الوصول لنماذج OpenAI GPT-4o و Embeddings API.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow text-center">
+                    <div class="text-4xl mb-4">&#x1F5C4;</div>
+                    <h3 class="font-bold text-brand-dark mb-2">قواعد البيانات</h3>
+                    <p class="text-sm text-gray-600">خوادم لتشغيل قواعد بيانات المتجهات Weaviate / ChromaDB.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow text-center">
+                    <div class="text-4xl mb-4">&#x1F4BB;</div>
+                    <h3 class="font-bold text-brand-dark mb-2">بيئة التطوير</h3>
+                    <p class="text-sm text-gray-600">بيئة محلية للفريق التقني لإدارة LangGraph و Python.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-brand-dark text-gray-400 py-8 text-center border-t border-gray-800">
+        <p class="text-sm">خطة التنفيذ التقنية - الهيئة العامة للشؤون الإسلامية والأوقاف</p>
+    </footer>
+
+    <script>
+        const pipelineData = {
+            phase1: {
+                title: "المرحلة الأولى: بناء قاعدة المعرفة ومعالجة البيانات",
+                items: [
+                    "<strong>تجميع البيانات:</strong> استخراج وتنظيف الفتاوى السابقة، قرارات مجلس الإفتاء، والكتب المعتمدة.",
+                    "<strong>التقسيم الذكي:</strong> تقسيم النصوص مع الحفاظ على السياق الشرعي وعدم فصل الأدلة.",
+                    "<strong>تضمين النصوص:</strong> استخدام text-embedding-3-large للتحويل لمتجهات.",
+                    "<strong>قاعدة المتجهات:</strong> تخزينها في ChromaDB أو Weaviate لسرعة الاسترجاع."
+                ]
+            },
+            phase2: {
+                title: "المرحلة الثانية: تطوير خط الاسترجاع (LangGraph)",
+                items: [
+                    "<strong>محرك الاستعلام:</strong> معالجة السؤال لفهم القصد، وتطبيق تقنية HyDE لتوليد إجابة مبدئية لرفع دقة البحث.",
+                    "<strong>الاسترجاع (Top-K):</strong> جلب أفضل النتائج من قاعدة البيانات.",
+                    "<strong>إعادة الترتيب (Rerank):</strong> تمرير النتائج على Cross-encoder لتقييم مدى تطابق الفتوى بدقة متناهية."
+                ]
+            },
+            phase3: {
+                title: "المرحلة الثالثة: ضوابط الأمان الشرعي والتوليد",
+                items: [
+                    "<strong>التحقق من النطاق:</strong> تصفية الأسئلة السياسية/الطبية.",
+                    "<strong>حد الثقة:</strong> تحويل السؤال لمفتي بشري إذا كان التطابق أقل من 85%.",
+                    "<strong>التوليد (LLM):</strong> استخدام GPT-4o مع System Prompt صارم جداً يمنع الآراء الشخصية ويلزم بذكر المصدر."
+                ]
+            },
+            phase4: {
+                title: "المرحلة الرابعة: واجهة المستخدم وحلقة التقييم",
+                items: [
+                    "<strong>المخرجات:</strong> الإجابة بلغة واضحة، نص الفتوى الأصلي، ورابط المصدر.",
+                    "<strong>حلقة التقييم:</strong> توفير أزرار لتقييم الإجابة.",
+                    "<strong>الأسئلة غير المجابة:</strong> تسجيل Fallback Queries في لوحة تحكم ليجيب عليها المفتون وتُضاف للقاعدة."
+                ]
+            }
+        };
+
+        function updatePipelineDisplay(phaseKey, element) {
+            document.querySelectorAll('.interactive-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            element.classList.add('active');
+            
+            const data = pipelineData[phaseKey];
+            const contentDiv = document.getElementById('pipeline-content');
+            
+            contentDiv.classList.remove('fade-in');
+            void contentDiv.offsetWidth; 
+            
+            document.getElementById('disp-title').innerHTML = data.title;
+            
+            const list = document.getElementById('disp-list');
+            list.innerHTML = '';
+            
+            data.items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = "flex items-start";
+                li.innerHTML = `<span class="text-brand-500 ml-3 mt-1">&#x25A0;</span><span>${item}</span>`;
+                list.appendChild(li);
+            });
+            
+            contentDiv.classList.add('fade-in');
+        }
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        function wrapChartLabels(labels) {
+            return labels.map(label => {
+                if (label.length <= 16) return label;
+                let words = label.split(' ');
+                let lines = [];
+                let currentLine = '';
+                for (let word of words) {
+                    if ((currentLine + word).length > 16) {
+                        if (currentLine) lines.push(currentLine.trim());
+                        currentLine = word + ' ';
+                    } else {
+                        currentLine += word + ' ';
+                    }
+                }
+                if (currentLine) lines.push(currentLine.trim());
+                return lines;
+            });
+        }
+
+        const globalTooltipConfig = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    if (Array.isArray(label)) {
+                        return label.join(' ');
+                    } else {
+                        return label;
+                    }
+                }
+            },
+            titleFont: { family: 'Cairo' },
+            bodyFont: { family: 'Cairo' }
+        };
+
+        const globalFont = { family: 'Cairo', size: 14 };
+
+        window.addEventListener('load', function() {
+            
+            const confCtx = document.getElementById('confidenceChart').getContext('2d');
+            const confLabels = ['قبول التوليد الآلي (أكبر من 85%)', 'تحويل للقسم البشري (أقل من 85%)'];
+            
+            new Chart(confCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: wrapChartLabels(confLabels),
+                    datasets: [{
+                        data: [85, 15],
+                        backgroundColor: ['#0d9488', '#e11d48'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: globalFont } },
+                        tooltip: globalTooltipConfig
+                    },
+                    cutout: '65%'
+                }
+            });
+
+            const timeCtx = document.getElementById('timelineChart').getContext('2d');
+            const timeLabels = ['الأسبوع 1', 'الأسبوع 2', 'الأسبوع 3', 'الأسبوع 4'];
+            
+            new Chart(timeCtx, {
+                type: 'bar',
+                data: {
+                    labels: wrapChartLabels(timeLabels),
+                    datasets: [
+                        {
+                            label: 'تنظيف البيانات و ChromaDB',
+                            data: [100, 0, 0, 0],
+                            backgroundColor: '#0f172a',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'الاسترجاع و Cross-encoder',
+                            data: [0, 100, 20, 0],
+                            backgroundColor: '#14b8a6',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'دمج LangGraph والضوابط',
+                            data: [0, 0, 80, 20],
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'واجهة المستخدم والاختبار',
+                            data: [0, 0, 0, 80],
+                            backgroundColor: '#0d9488',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, ticks: { font: globalFont }, grid: { display: false } },
+                        y: { stacked: true, ticks: { font: globalFont, stepSize: 20 }, max: 120, title: { display: true, text: 'مستوى الإنجاز / الجهد', font: globalFont } }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { font: globalFont } },
+                        tooltip: globalTooltipConfig
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
