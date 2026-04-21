@@ -4,4 +4,10 @@ services:
     container_name: awqaf-ai
     ports:
       - "8080:80"
+    networks:
+      - web-gateway
     restart: always
+
+networks:
+  web-gateway:
+    external: true
