@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاكي المفتي الذكي - الهيئة العامة للشؤون الإسلامية والأوقاف</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            primary: '#0D9488', // Teal 600
+                            primaryDark: '#0F766E', // Teal 700
+                            secondary: '#F59E0B', // Amber 500
+                            dark: '#0F172A', // Slate 900
+                            light: '#F8FAFC', // Slate 50
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #F8FAFC; color: #0F172A; }
+        .tab-btn { position: relative; transition: all 0.3s ease; }
+        .tab-btn.active { color: #0D9488; font-weight: 700; }
+        .tab-btn.active::after {
+            content: ''; position: absolute; bottom: -2px; left: 0; right: 0;
+            height: 3px; background-color: #0D9488; border-radius: 3px 3px 0 0;
+        }
+        
+        /* Custom Scrollbar for Pipeline Steps */
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Toast Animation */
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-enter { animation: slideUp 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">🏛️</span>
+                <div>
+                    <h1 class="font-bold text-lg text-brand-dark leading-tight">المفتي الذكي <span class="text-xs bg-brand-primary/10 text-brand-primary px-2 py-0.5 rounded-full ml-2">نسخة تجريبية</span></h1>
+                    <p class="text-xs text-gray-500">محاكاة استرجاع الإجابات الفقهية (RAG)</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Navigation Tabs -->
+        <div class="flex gap-6 border-b border-gray-200 mb-8 px-2 overflow-x-auto custom-scrollbar">
+            <button class="tab-btn active pb-3 px-1 text-gray-500 hover:text-brand-dark font-medium whitespace-nowrap" onclick="switchTab('user', this)">
+                <span class="mr-2">💬</span> واجهة المستخدم المستفتي
+            </button>
+            <button class="tab-btn pb-3 px-1 text-gray-500 hover:text-brand-dark font-medium whitespace-nowrap" onclick="switchTab('mufti', this)">
+                <span class="mr-2">⚖️</span> لوحة المفتي (الاعتماد)
+            </button>
+            <button class="tab-btn pb-3 px-1 text-gray-500 hover:text-brand-dark font-medium whitespace-nowrap" onclick="switchTab('pipeline', this)">
+                <span class="mr-2">⚙️</span> تفاصيل خط الأنابيب (Pipeline)
+            </button>
+        </div>
+
+        <!-- ══ USER TAB ══ -->
+        <div id="tab-user" class="animate-fade-in">
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+                <p class="text-sm font-semibold text-gray-500 mb-3">اختر سؤالاً لتجربة النظام:</p>
+                
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button class="bg-gray-50 hover:bg-teal-50 text-gray-700 hover:text-brand-primary border border-gray-200 hover:border-teal-200 px-4 py-2 rounded-full text-sm transition-all duration-200" onclick="loadQ(0)">حكم صلاة الجمعة عبر الإنترنت</button>
+                    <button class="bg-gray-50 hover:bg-teal-50 text-gray-700 hover:text-brand-primary border border-gray-200 hover:border-teal-200 px-4 py-2 rounded-full text-sm transition-all duration-200" onclick="loadQ(1)">زكاة العملات الرقمية</button>
+                    <button class="bg-gray-50 hover:bg-teal-50 text-gray-700 hover:text-brand-primary border border-gray-200 hover:border-teal-200 px-4 py-2 rounded-full text-sm transition-all duration-200" onclick="loadQ(2)">حكم التأمين التجاري</button>
+                    <button class="bg-gray-50 hover:bg-teal-50 text-gray-700 hover:text-brand-primary border border-gray-200 hover:border-teal-200 px-4 py-2 rounded-full text-sm transition-all duration-200" onclick="loadQ(3)">صيام من يعمل في بيئة مرهقة</button>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-3 mb-6 relative">
+                    <div class="relative flex-grow">
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400">🔍</span>
+                        <input type="text" id="q-input" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-brand-primary focus:border-brand-primary block pr-10 p-3.5 transition-colors" placeholder="اكتب سؤالك الفقهي هنا..." value="حكم صلاة الجمعة عبر الإنترنت">
+                    </div>
+                    <button onclick="runQuery()" class="w-full sm:w-auto bg-brand-primary hover:bg-brand-primaryDark text-white font-bold rounded-xl px-8 py-3.5 transition-colors shadow-sm shadow-teal-500/30 flex items-center justify-center gap-2">
+                        بحث بالذكاء الاصطناعي
+                    </button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden mb-8">
+                    <div id="progress" class="h-full bg-brand-secondary transition-all duration-300 ease-out" style="width: 0%"></div>
+                </div>
+
+                <!-- Result Area -->
+                <div id="result-area" class="min-h-[250px] flex items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50">
+                    <div class="text-center text-gray-400">
+                        <div class="text-4xl mb-2">💭</div>
+                        <p class="text-sm">اختر سؤالاً من الأعلى أو اكتب سؤالك واضغط بحث لمحاكاة الرد</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ MUFTI TAB ══ -->
+        <div id="tab-mufti" class="hidden animate-fade-in">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm text-center">
+                    <p class="text-sm font-semibold text-gray-500 mb-1">في انتظار المراجعة</p>
+                    <p class="text-3xl font-bold text-brand-secondary">12 <span class="text-sm font-normal text-gray-400">سؤال</span></p>
+                </div>
+                <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm text-center">
+                    <p class="text-sm font-semibold text-gray-500 mb-1">فتاوى معتمدة اليوم</p>
+                    <p class="text-3xl font-bold text-green-600">47 <span class="text-sm font-normal text-gray-400">فتوى</span></p>
+                </div>
+                <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm text-center">
+                    <p class="text-sm font-semibold text-gray-500 mb-1">معدل الدقة الآلية</p>
+                    <p class="text-3xl font-bold text-brand-primary">94% <span class="text-sm font-normal text-green-500 text-xs">↑ 2%</span></p>
+                </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-md relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1 h-full bg-brand-secondary"></div>
+                
+                <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">حكم التأمين التجاري على الممتلكات</h3>
+                        <p class="text-xs text-gray-500">طُرح بواسطة: مستخدم من دبي · عبر التطبيق · منذ 23 دقيقة</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1.5 rounded-full border border-yellow-200">
+                        <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                        ثقة متوسطة — 68%
+                    </span>
+                </div>
+
+                <div class="bg-red-50 border-r-4 border-red-500 p-4 rounded-l-lg mb-6 flex gap-3">
+                    <div class="text-red-500 text-xl mt-0.5">⚠️</div>
+                    <div>
+                        <h4 class="text-sm font-bold text-red-800 mb-1">تنبيه الـ Guardrail — مسألة خلافية معاصرة (تم إيقاف النشر الآلي)</h4>
+                        <p class="text-xs text-red-700 leading-relaxed">هذه المسألة فيها خلاف معاصر بين المجامع الفقهية. استرجع النظام أقوالاً متعددة بنسب ثقة متقاربة. يوصي النظام بمراجعة المفتي البشري لاختيار الرأي المعتمد لدى الهيئة قبل الإصدار للمستخدم.</p>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">المسودة المولدة آلياً:</h4>
+                    <p class="text-gray-800 text-sm leading-loose bg-gray-50 p-4 rounded-xl border border-gray-100">اختلف العلماء المعاصرون في التأمين التجاري على قولين: الأول أنه محرم لما فيه من الغرر والقمار، وهو رأي جمهور المجامع الفقهية. والثاني أنه جائز للحاجة والضرورة الاجتماعية...</p>
+                </div>
+
+                <div class="flex flex-wrap gap-3 mt-6 pt-6 border-t border-gray-100">
+                    <button onclick="sendPrompt('تم اعتماد الفتوى')" class="bg-brand-primary hover:bg-brand-primaryDark text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors">
+                        ✅ اعتماد المسودة ونشرها
+                    </button>
+                    <button onclick="sendPrompt('جاري تحرير الفتوى')" class="bg-white border-2 border-brand-primary text-brand-primary hover:bg-teal-50 px-5 py-2.5 rounded-lg text-sm font-bold transition-colors">
+                        ✏️ تعديل قبل النشر
+                    </button>
+                    <button onclick="sendPrompt('تم إعادة توجيه السؤال للبحث العميق')" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-5 py-2.5 rounded-lg text-sm transition-colors">
+                        🔄 إعادة البحث في المصادر
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ PIPELINE TAB ══ -->
+        <div id="tab-pipeline" class="hidden animate-fade-in">
+            
+            <div class="bg-brand-dark rounded-3xl p-8 mb-8 text-white relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 opacity-10 text-9xl">⚙️</div>
+                <h2 class="text-2xl font-bold mb-2">خط الأنابيب الوكائلي (Agentic Pipeline)</h2>
+                <p class="text-gray-400 text-sm mb-6">التسلسل المنطقي لمعالجة أي سؤال فقهي يتم إدخاله في النظام، لضمان أعلى درجات الدقة والأمان الشرعي.</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 relative z-10">
+                    <div class="bg-white/10 border border-white/20 rounded-xl p-5 hover:bg-white/15 transition-colors">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-brand-secondary text-sm">1. Query Analysis</h3>
+                            <span class="text-xs bg-black/30 text-gray-300 px-2 py-1 rounded">معالجة</span>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">تصنيف الموضوع (عبادات/معاملات) · استخراج الكيانات الفقهية · تحديد المذاهب ذات الصلة عبر LLM.</p>
+                    </div>
+                    
+                    <div class="bg-white/10 border border-white/20 rounded-xl p-5 hover:bg-white/15 transition-colors">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-brand-secondary text-sm">2. HyDE Expansion</h3>
+                            <span class="text-xs bg-black/30 text-gray-300 px-2 py-1 rounded">توسيع</span>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">توليد إجابة افتراضية (Hypothetical Document) للبحث الدلالي لتحسين دقة استرجاع الفتاوى المشابهة بنسبة كبيرة.</p>
+                    </div>
+
+                    <div class="bg-white/10 border border-white/20 rounded-xl p-5 hover:bg-white/15 transition-colors">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-brand-secondary text-sm">3. Vector Search</h3>
+                            <span class="text-xs bg-black/30 text-gray-300 px-2 py-1 rounded">استرجاع</span>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">جلب أفضل 20 نتيجة من قاعدة ChromaDB باستخدام تضمينات عربية عالية الدقة (text-embedding-3-large).</p>
+                    </div>
+
+                    <div class="bg-white/10 border border-white/20 rounded-xl p-5 hover:bg-white/15 transition-colors">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-brand-secondary text-sm">4. Reranking</h3>
+                            <span class="text-xs bg-black/30 text-gray-300 px-2 py-1 rounded">ترتيب</span>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">استخدام نموذج Cross-encoder عربي لإعادة تقييم وترتيب أفضل 5 نتائج بوزن أعلى للمصادر الأصيلة والمعتمدة.</p>
+                    </div>
+
+                    <div class="bg-white/10 border border-white/20 rounded-xl p-5 hover:bg-white/15 transition-colors">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-red-400 text-sm">5. Guardrails Check</h3>
+                            <span class="text-xs bg-red-900/50 text-red-200 px-2 py-1 rounded">أمان</span>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">كشف المسائل الحساسة/السياسية · حساب نسبة الثقة · اتخاذ قرار التصعيد للمفتي البشري تلقائياً إذا لزم الأمر.</p>
+                    </div>
+
+                    <div class="bg-white/10 border border-white/20 rounded-xl p-5 hover:bg-white/15 transition-colors">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-brand-primary text-sm">6. Generation & UI</h3>
+                            <span class="text-xs bg-teal-900/50 text-teal-200 px-2 py-1 rounded">توليد</span>
+                        </div>
+                        <p class="text-xs text-gray-300 leading-relaxed">استخدام GPT-4o مع System Prompt شرعي لصياغة الإجابة الموثقة + عرض المصادر ودرجة الثقة للمستفتي.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
+                <div>
+                    <h4 class="text-sm font-bold text-gray-800 mb-1">Stack التقني المقترح لبناء النظام:</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed">
+                        LangGraph (Orchestration) · ChromaDB (Vector Store) · GPT-4o (Generation) · text-embedding-3-large (Embeddings) · FastAPI (Backend)
+                    </p>
+                </div>
+                <button onclick="sendPrompt('إظهار كود بايثون المقترح')" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold px-4 py-2 rounded-lg text-sm transition-colors whitespace-nowrap">
+                    📄 عرض الهيكلية البرمجية
+                </button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Custom Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 left-5 z-50 flex flex-col gap-2"></div>
+
+    <script>
+        // Data Source
+        const QA = [
+            {
+                q: "حكم صلاة الجمعة عبر الإنترنت",
+                conf: "low",
+                confLabel: "ثقة منخفضة — يحتاج مراجعة مفتي",
+                guardrail: true,
+                guardrailMsg: "هذه مسألة معاصرة نازلة لم يُفصل فيها قديماً. النظام وجد آراءً متعارضة بدرجة ثقة منخفضة. يُوجَّه السؤال تلقائياً للمفتي.",
+                answer: "اختلف العلماء المعاصرون في هذه المسألة المستجدة: ذهب أكثرهم إلى عدم صحة الاقتداء عبر الإنترنت لانعدام الاتحاد المكاني المعتبر شرعاً. وأجاز بعض المعاصرين ذلك عند الحاجة القصوى قياساً على الاقتداء عبر مكبرات الصوت. والأحوط في المسألة الحضور الشخصي متى أمكن.",
+                sources: [
+                    { title: "قرار مجمع الفقه الإسلامي", meta: "مجمع الفقه الإسلامي الدولي · 2020", score: "91%" },
+                    { title: "فتاوى المجلس الأوروبي للبحوث", meta: "المجلس الأوروبي · قرار 112", score: "87%" },
+                    { title: "رأي هيئة كبار العلماء", meta: "المملكة العربية السعودية · 2021", score: "82%" },
+                ]
+            },
+            {
+                q: "زكاة العملات الرقمية",
+                conf: "med",
+                confLabel: "ثقة متوسطة — 72%",
+                guardrail: true,
+                guardrailMsg: "مسألة معاصرة نازلة. النظام استرجع فتاوى حديثة من مجامع موثوقة مع تفاصيل دقيقة تحتاج تحقق.",
+                answer: "أفتى جمهور العلماء المعاصرين بوجوب الزكاة في العملات الرقمية كالبيتكوين لأنها أموال متقومة ذات قيمة سوقية. تُحسب زكاتها بالقيمة السوقية في يوم الاستحقاق وتكون بنسبة 2.5% شريطة بلوغ النصاب وحولان الحول المالي.",
+                sources: [
+                    { title: "فتوى دار الإفتاء المصرية", meta: "دار الإفتاء المصرية · رقم 4432", score: "89%" },
+                    { title: "المعايير الشرعية", meta: "AAOIFI · المعيار الشرعي رقم 62", score: "85%" },
+                    { title: "بحث فقهي معاصر", meta: "مجلة مجمع الفقه الإسلامي", score: "78%" },
+                ]
+            },
+            {
+                q: "حكم التأمين التجاري",
+                conf: "med",
+                confLabel: "ثقة متوسطة — 68%",
+                guardrail: true,
+                guardrailMsg: "مسألة خلافية معاصرة. تم الإشارة للمفتي تلقائياً للمراجعة النهائية قبل الإصدار لضمان توافقها مع معتمد الهيئة.",
+                answer: "اختلف العلماء المعاصرون في التأمين التجاري: يرى الجمهور تحريمه لما فيه من الغرر وجهالة المعوض. ويجيزه بعضهم للحاجة الاجتماعية والمصلحة العامة، لا سيما الإلزامي منه. والبديل الشرعي المُتفق عليه هو التأمين التكافلي التعاوني.",
+                sources: [
+                    { title: "قرار مجمع الفقه رقم 9", meta: "مجمع الفقه الإسلامي الدولي · جدة", score: "93%" },
+                    { title: "بحوث فقه المعاملات", meta: "كتاب المعاملات المالية المعاصرة", score: "86%" },
+                    { title: "المعايير الشرعية", meta: "AAOIFI · المعيار الشرعي رقم 26", score: "81%" },
+                ]
+            },
+            {
+                q: "صيام من يعمل في بيئة مرهقة",
+                conf: "high",
+                confLabel: "ثقة عالية — 94%",
+                guardrail: false,
+                guardrailMsg: "",
+                answer: "يجوز للعامل الذي يشق عليه الصوم مشقة شديدة خارجة عن المعتاد تُلحق به ضرراً ظاهراً أن يُفطر، ويقضي ما أفطره في أيام أُخر. أما إن كانت المشقة في حدود المعتاد المحتمل فيلزمه الصوم. والأصل وجوب الصوم على المكلف القادر.",
+                sources: [
+                    { title: "الفقه الإسلامي وأدلته", meta: "وهبة الزحيلي · المجلد الثاني", score: "96%" },
+                    { title: "المغني لابن قدامة", meta: "ابن قدامة المقدسي · كتاب الصيام", score: "91%" },
+                    { title: "فتاوى معتمدة", meta: "أرشيف فتاوى الهيئة العامة", score: "88%" },
+                ]
+            }
+        ];
+
+        // Tab Switching Logic
+        function switchTab(tabId, btnElement) {
+            // Hide all tabs
+            ['tab-user', 'tab-mufti', 'tab-pipeline'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            
+            // Remove active classes from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab and set button active
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            btnElement.classList.add('active');
+        }
+
+        // Load Question from Chips
+        function loadQ(index) {
+            document.getElementById('q-input').value = QA[index].q;
+            runQuery(index);
+        }
+
+        // Simulate Query Execution
+        function runQuery(idx = null) {
+            const inputVal = document.getElementById('q-input').value.trim();
+            if (!inputVal) return;
+
+            // Find index if matching, else default to random/0 for demo
+            let qIndex = idx !== null ? idx : QA.findIndex(item => item.q === inputVal);
+            if(qIndex === -1) qIndex = Math.floor(Math.random() * QA.length); // fallback for custom input
+
+            const bar = document.getElementById('progress');
+            const area = document.getElementById('result-area');
+            
+            area.innerHTML = `
+                <div class="flex flex-col items-center justify-center text-brand-primary h-full py-12">
+                    <svg class="animate-spin h-10 w-10 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="text-sm font-semibold text-gray-600 animate-pulse">جاري البحث في قاعدة المعرفة والفتاوى المعتمدة...</p>
+                </div>`;
+
+            let width = 0;
+            bar.style.width = '0%';
+            
+            const interval = setInterval(() => {
+                width += Math.random() * 25;
+                if (width >= 100) {
+                    width = 100;
+                    bar.style.width = width + '%';
+                    clearInterval(interval);
+                    setTimeout(() => renderResult(qIndex), 300);
+                } else {
+                    bar.style.width = width + '%';
+                }
+            }, 300);
+        }
+
+        // Render Result UI
+        function renderResult(i) {
+            const data = QA[i];
+            
+            // Determine styling based on confidence
+            let confBg, confText, confDot;
+            if (data.conf === 'high') { confBg = 'bg-green-100'; confText = 'text-green-800'; confDot = 'bg-green-500'; }
+            else if (data.conf === 'med') { confBg = 'bg-yellow-100'; confText = 'text-yellow-800'; confDot = 'bg-yellow-500'; }
+            else { confBg = 'bg-red-100'; confText = 'text-red-800'; confDot = 'bg-red-500'; }
+
+            // Guardrail Alert HTML
+            const guardrailHtml = data.guardrail ? `
+                <div class="bg-red-50 border-r-4 border-red-500 p-4 rounded-l-xl mb-6 flex gap-3 shadow-sm">
+                    <div class="text-red-500 text-lg mt-0.5">🛡️</div>
+                    <div>
+                        <h4 class="text-sm font-bold text-red-800 mb-1">تنبيه النظام (Guardrail)</h4>
+                        <p class="text-xs text-red-700 leading-relaxed">${data.guardrailMsg}</p>
+                    </div>
+                </div>` : '';
+
+            // Sources List HTML
+            const sourcesHtml = data.sources.map((s, idx) => `
+                <div class="flex items-center gap-4 p-3 bg-gray-50 border border-gray-100 rounded-xl mb-2 hover:bg-gray-100 transition-colors">
+                    <div class="flex-shrink-0 w-6 h-6 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center text-xs font-bold">
+                        ${idx + 1}
+                    </div>
+                    <div class="flex-grow">
+                        <p class="text-sm font-semibold text-gray-800">${s.title}</p>
+                        <p class="text-xs text-gray-500">${s.meta}</p>
+                    </div>
+                    <div class="flex-shrink-0 text-xs font-bold text-brand-primary bg-white px-2 py-1 rounded shadow-sm border border-gray-100">
+                        ملاءمة: ${s.score}
+                    </div>
+                </div>`).join('');
+
+            // Build Final HTML
+            const html = `
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8 animate-fade-in text-right">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-gray-100">
+                        <h3 class="text-lg font-bold text-gray-900">${data.q}</h3>
+                        <span class="inline-flex items-center gap-1.5 ${confBg} ${confText} text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap">
+                            <span class="w-2 h-2 rounded-full ${confDot}"></span>
+                            ${data.confLabel}
+                        </span>
+                    </div>
+                    
+                    ${guardrailHtml}
+                    
+                    <div class="mb-8 relative">
+                        <span class="absolute -top-3 -right-2 text-4xl text-gray-200 opacity-50 font-serif">"</span>
+                        <p class="text-gray-800 text-[15px] leading-loose relative z-10 px-4">${data.answer}</p>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <span>📚</span> المصادر الفقهية المعتمدة المسترجعة
+                        </h4>
+                        <div class="space-y-1">
+                            ${sourcesHtml}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-gray-100 flex items-start gap-2">
+                        <span class="text-gray-400">ℹ️</span>
+                        <p class="text-xs text-gray-400 leading-relaxed">
+                            هذه النتيجة مُولّدة آلياً عبر الذكاء الاصطناعي بغرض البحث والاسترشاد العلمي. للحصول على فتوى شرعية رسمية مُلزمة، يُرجى اعتمادها من قبل مفتي الهيئة المعتمد.
+                        </p>
+                    </div>
+                </div>`;
+
+            document.getElementById('result-area').innerHTML = html;
+        }
+
+        // Custom Toast Notification System
+        function sendPrompt(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-gray-900 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-3 toast-enter border border-gray-700';
+            
+            toast.innerHTML = `
+                <span class="text-green-400">✓</span>
+                <span class="text-sm font-medium">${msg}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(100%)';
+                toast.style.transition = 'all 0.3s ease-in';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
