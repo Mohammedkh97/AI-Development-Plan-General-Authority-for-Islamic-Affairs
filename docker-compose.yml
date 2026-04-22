@@ -6,6 +6,11 @@ services:
       - "8080:80"
     networks:
       - web-gateway
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.awqaf.rule=Host(`awqaf-gov-ai.duckdns.org`)"
+      - "traefik.http.routers.awqaf.entrypoints=websecure"
+      - "traefik.http.routers.awqaf.tls.certresolver=myresolver"
     restart: always
 
 networks:
